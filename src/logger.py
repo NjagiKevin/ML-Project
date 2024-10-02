@@ -1,7 +1,7 @@
 import logging # for configuring and writing log messages
 import os # for creating directories and file paths
 from datetime import datetime # to generate the current timestamp for the log file name
-
+ 
 
 LOG_FILE=f"{datetime.now().strftime('%m_%d_%Y_%H_%M_%S')}.log" # generates a log file name based on the current date and time
 
