@@ -15,11 +15,12 @@ from src.components.model_trainer import ModelTrainer
 
 @dataclass
 class DataIngestionConfig:
-    train_data_path: str = os.path.join('artifacts', 'train.csv')
+    train_data_path: str = os.path.join('artifacts', 'train.csv') # os.path.join() helps format paths in a platform-independent way.
     test_data_path: str = os.path.join('artifacts', 'test.csv')
     raw_data_path: str = os.path.join('artifacts', 'data.csv')
 
 
+# logic to ingest data (i.e., load the dataset and split it into training and test sets)
 class DataIngestion: 
     def __init__(self):  
         self.ingestion_config = DataIngestionConfig()
@@ -31,10 +32,11 @@ class DataIngestion:
             df = pd.read_csv(r'notebook\data\stud.csv')  
             logging.info('Read the dataset as dataframe')
 
+            # saving data to a csv file
             os.makedirs(os.path.dirname(self.ingestion_config.train_data_path), exist_ok=True)
-
             df.to_csv(self.ingestion_config.raw_data_path, index=False, header=True)
 
+            # splitting the dataset
             logging.info("Train test split initiated")
             train_set, test_set = train_test_split(df, test_size=0.2, random_state=40)
 

@@ -16,12 +16,16 @@ import os
 from src.utils import save_object
 
 
+
+# specifies the path where the preprocessor (pipeline for transforming data) will be saved (preprocessor.pkl)
 @dataclass
 class DataTransformationConfig:
     preprocessor_obj_file_path=os.path.join('artifacts',"preprocessor.pkl")
 
+
+# This class is responsible for transforming the data, i.e., handling missing values, scaling numerical columns, and one-hot encoding categorical columns
 class DataTransformation:
-    def __init__(self):
+    def __init__(self): # The constructor initializes an instance of DataTransformationConfig
         self.data_transformation_config=DataTransformationConfig()
 
     def get_data_transformer_object(self): #creates all pkl files responsible for standard scaling and OHE

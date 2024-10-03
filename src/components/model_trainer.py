@@ -21,12 +21,15 @@ from src.pipeline import predict_pipeline
 from src.utils import save_object, evaluate_models
 
 
-@dataclass
+
+@dataclass # This configuration class specifies where the trained model will be saved (model.pkl)
 class ModelTrainerConfig():
     trained_model_file_path=os.path.join("artifacts","model.pkl")
 
+
+
 class ModelTrainer:
-    def __init__(self):
+    def __init__(self): # The constructor initializes the ModelTrainerConfig instance
         self.model_trainer_config=ModelTrainerConfig()
 
     def initiate_model_trainer(self, train_array,test_array):
