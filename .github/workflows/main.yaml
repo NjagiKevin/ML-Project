@@ -38,6 +38,10 @@ jobs:
           sudo apt-get update  # Updates the package list
           sudo apt-get install -y jq unzip  # Installs jq and unzip utilities
 
+      # Optional: Login to Docker Hub (Uncomment if using Docker Hub)
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1  # Configures AWS credentials for further AWS actions
         with:
@@ -60,6 +64,9 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .  # Builds the Docker image
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG  # Pushes the Docker image to ECR
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"  # Sets the output for the image URL
+
+      - name: Clean up dangling images
+        run: docker image prune -f  # Cleans up any dangling Docker images
 
   Continuous-Deployment:
     needs: build-and-push-ecr-image  # This job depends on the successful completion of the build-and-push-ecr-image job
@@ -85,12 +92,12 @@ jobs:
          
       # - name: Stop and remove container if running
       #   run: |
-      #    docker ps -q --filter "name=mltest" | grep -q . && docker stop mltest && docker rm -fv mltest
+      #     docker ps -q --filter "name=mltest" | grep -q . && docker stop mltest && docker rm -fv mltest
       # Uncomment this step to stop and remove a running container named "mltest" before starting a new one.
-       
+
       - name: Run Docker Image to serve users
         run: |
-          docker run -d -p 8080:8080 --ipc="host" --name=mltest -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e 'AWS_REGION=${{ secrets.AWS_REGION }}'  ${{ secrets.AWS_ECR_LOGIN_URI }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+          docker run -d -p 8080:8080 --ipc="host" --name=mltest -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e 'AWS_REGION=${{ secrets.AWS_REGION }}' ${{ secrets.AWS_ECR_LOGIN_URI }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
           # Runs the Docker container from the latest image, exposing port 8080 and passing in AWS credentials as environment variables.
 
       - name: Clean previous images and containers
